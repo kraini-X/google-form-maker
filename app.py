@@ -10,18 +10,24 @@ GEMINI_API_KEY = os.getenv("API_KEY")
 GAS_URL = os.getenv("BACKEND_URL", "https://script.google.com/macros/s/AKfycbwgdq5ihodg-opiJUs1MnCXKVUUcufkofAF5mqBecSjwM257TVHFkboqPRkByw1bQyErA/exec")
 
 
-def generate_responses_with_gemini(prompt, count=5):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
-    headers = {"Content-Type": "application/json"}
-    data = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.7}
+def generate_responses_with_groq(prompt, count=5):
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
     }
+    data = {
+        "model": "llama3-8b-8192",  # or mixtral-8x7b, gemma-7b-it
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7,
+        "n": 1
+    }
+    
     try:
         res = requests.post(url, headers=headers, json=data)
         if res.ok:
-            text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-            return text.strip().split("\n")[:count]
+            content = res.json()["choices"][0]["message"]["content"]
+            return content.strip().split("\n")[:count]
         else:
             return [f"API error: {res.text}"]
     except Exception as e:
@@ -63,7 +69,7 @@ for i, q in enumerate(st.session_state.questions):
             if q["text"]:
                 with st.spinner("Generating..."):
                     prompt = f"Generate {num} realistic options for a form question: '{q['text']}'"
-                    ai_data = generate_responses_with_gemini(prompt, count=num)
+                    ai_data = generate_responses_with_groq(prompt, count=num)
                     q["options"] = [opt.strip("•- ").strip() for opt in ai_data]
                     st.success("Generated using AI!")
                     st.write(q["options"])
