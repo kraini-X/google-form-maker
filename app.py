@@ -7,7 +7,7 @@ import os
 st.set_page_config(page_title="AI Form Generator", layout="centered")
 load_dotenv()
 
-# Secret and environment variable loading
+
 GROQ_API_KEY = st.secrets["API_KEY"]
 GAS_URL = os.getenv("BACKEND_URL", "https://script.google.com/macros/s/AKfycbwgdq5ihodg-opiJUs1MnCXKVUUcufkofAF5mqBecSjwM257TVHFkboqPRkByw1bQyErA/exec")
 
@@ -34,7 +34,7 @@ def generate_responses_with_groq(prompt, count=5):
     except Exception as e:
         return [f"Error: {e}"]
 
-# UI
+
 st.title("🧠 AI-Powered Google Form Generator")
 form_title = st.text_input("📋 Enter Google Form Title")
 
@@ -60,13 +60,13 @@ for i, q in enumerate(st.session_state.questions):
         key=f"type_{i}"
     )
 
-    # Handle options
+
     if q["type"] in ["Multiple Choice", "Checkboxes", "Dropdown"]:
         csv = st.file_uploader("Upload CSV for options (first column used)", key=f"csv_{i}")
         manual = st.text_area("Or enter comma-separated options", key=f"manual_{i}")
         num = st.number_input("🔢 Number of AI responses", 1, 20, value=5, key=f"num_{i}")
 
-        # Generate with AI
+   
         if st.button("✨ Generate with Gemini", key=f"gen_{i}"):
             if q["text"]:
                 with st.spinner("Generating..."):
@@ -78,7 +78,7 @@ for i, q in enumerate(st.session_state.questions):
             else:
                 st.warning("Enter question text first.")
 
-        # CSV upload
+
         if csv:
             try:
                 df = pd.read_csv(csv)
@@ -89,11 +89,11 @@ for i, q in enumerate(st.session_state.questions):
             except Exception as e:
                 st.error(f"Error reading CSV: {e}")
 
-        # Manual input
+      
         elif manual:
             q["options"] = list(dict.fromkeys([x.strip() for x in manual.split(",") if x.strip()]))
 
-# Submit form
+
 if st.button("🚀 Generate Google Form"):
     if not form_title or not st.session_state.questions:
         st.error("Please enter a form title and at least one question.")
