@@ -96,10 +96,22 @@ if st.button("🚀 Generate Google Form"):
         try:
             response = requests.post(GAS_URL, json=form_data)
             if response.ok:
-                form_link = response.json().get("form_url", "")
-                st.success("✅ Google Form created!")
-                st.markdown(f"[🔗 Click to Open Form]({form_link})")
+                try:
+                    res_json = response.json()
+                    form_link = res_json.get("form_url", "")
+                    if form_link:
+                        st.success("✅ Google Form created!")
+                        st.markdown(f"[🔗 Click to Open Form]({form_link})")
+                    else:
+                        st.warning("Form created but no link returned.")
+                        st.write("Response JSON:", res_json)
+                except Exception as parse_err:
+                    st.error("Response is not valid JSON.")
+                    st.text("Raw response:")
+                    st.code(response.text)
             else:
                 st.error("❌ Failed to create form. Check your script or URL.")
+                st.code(response.text)
         except Exception as e:
             st.error(f"Error occurred: {e}")
+
