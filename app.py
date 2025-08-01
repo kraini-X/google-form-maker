@@ -6,7 +6,7 @@ import os
 
 st.set_page_config(page_title="AI Form Generator", layout="centered")
 load_dotenv()
-GEMINI_API_KEY = os.getenv("API_KEY")
+GROQ_API_KEY = os.getenv("API_KEY")
 GAS_URL = os.getenv("BACKEND_URL", "https://script.google.com/macros/s/AKfycbwgdq5ihodg-opiJUs1MnCXKVUUcufkofAF5mqBecSjwM257TVHFkboqPRkByw1bQyErA/exec")
 
 
